@@ -1,7 +1,6 @@
 #include "Leaf.h"
 
 
-//Leaf::Leaf(int Width, int Height, int difficulty, char ( &a )[height][width]) {
 Leaf::Leaf(int Width, int Height, int Difficulty) {
     this->_width = Width;
     this->_height = Height;
@@ -14,60 +13,54 @@ Leaf::Leaf(int Width, int Height, int Difficulty) {
         }
     }
 
-//    for (int i = 0; i < _height; i++) {
-//        for (int j = 0; j < _width; j++) {
-//            this->_map[i][j] = a[i][j];
-//        }
-//    }
-
-    //Рандомное кол-во вещей от 1+ сложность/2 до сложности *2
+    //Рандомное кол-во вещей от 1 + сложность до сложности *3
     random_device dev;
     mt19937 rng(dev());
-    uniform_int_distribution<mt19937::result_type> dist(1 + difficulty, difficulty * 3);
+    uniform_int_distribution<mt19937::result_type> dist(1 + _difficulty, _difficulty * 3);
     this->_traps = dist(rng);
     this->_monsters = dist(rng);
     this->_chests = dist(rng);
 
-    uniform_int_distribution<mt19937::result_type> dist_smth(0, difficulty / 3);
+    //Рандомное кол-во smth(?) от 0 до сложности/3
+    uniform_int_distribution<mt19937::result_type> dist_smth(0, _difficulty / 3);
     this->_smth = dist_smth(rng);
 
     //Создание комнат
     for (int k = 0; k < count_rooms; k++) {
-        cout << "start" << endl;
-        int xmax = int((this->_width) * 0.75);  // Максимальные координаты новой комнаты (левый верхний угол)
+        // Максимальные координаты новой комнаты (левый верхний угол)
+        int xmax = int((this->_width) * 0.75);
         int ymax = int((this->_height) * 0.75);
-        cout << "xmax = " << xmax << " ymax = " << ymax << endl;
 
-        uniform_int_distribution<mt19937::result_type> dist_x(4, xmax); // Рандомные координаты новой комнаты
+        // Рандомные координаты новой комнаты
+        uniform_int_distribution<mt19937::result_type> dist_x(4, xmax);
         uniform_int_distribution<mt19937::result_type> dist_y(4, ymax);
         int x = dist_x(rng);
         int y = dist_y(rng);
-        cout << "1 x = " << x << " y = " << y << endl;
-//        cout << _map[x][y]<<endl;
-//        if (_map[x][y] == char_blank) {              //Чтобы реже начинать делат комнату из точки, которая уже в комнате
-//            cout << "?3" << endl;
-//            x = dist_x(rng);
-//            y = dist_y(rng);
-//        }
-        cout << "2 x = " << x << " y = " << y << endl;
 
-        int Width_max = 2 + (this->_width - x) * size_coefficient;  //Максимальный размер комнаты
+        //Максимальный размер новой комнаты
+        int Width_max = 2 + (this->_width - x) * size_coefficient;
         int Hight_max = 2 + (this->_height - y) * size_coefficient;
-        cout << "Width_max = " << Width_max << " Hight_max = " << Hight_max << endl;
-        uniform_int_distribution<mt19937::result_type> dist_size_x(4, Width_max);
-        uniform_int_distribution<mt19937::result_type> dist_size_y(4, Hight_max);
+
+        // Рандомные размер новой комнаты
+        uniform_int_distribution<mt19937::result_type> dist_size_x(4, Width_max + 1);
+        uniform_int_distribution<mt19937::result_type> dist_size_y(4, Hight_max + 1);
         int Width = dist_size_x(rng);
         int Height = dist_size_y(rng);
-        cout << "Width = " << Width << " Height = " << Height << endl;
 
 
         //Создание комнаты
         this->_Rooms.push_back(Room(x, y, Width, Height, k, _Rooms));
-        cout << endl << "_Room size: " << _Rooms.size() << endl << endl;
 
         //Изменение карты
         ChangeMap(x, y, Height, Width, k);
+
         //Вывод
+        /*
+        cout<<"Creating a new room "<<endl;
+        cout << "xmax = " << xmax << " ymax = " << ymax << endl;
+        cout << "x = " << x << " y = " << y << endl;
+        cout << "Width_max = " << Width_max << " Hight_max = " << Hight_max << endl;
+        cout << "Width = " << Width << " Height = " << Height << endl;
         for (int i = 0; i < _height; i++) {
             cout << "  ";
             for (int j = 0; j < _width; j++) {
@@ -75,6 +68,7 @@ Leaf::Leaf(int Width, int Height, int Difficulty) {
             }
             cout << endl;
         }
+         */
     }
 }
 
@@ -85,14 +79,6 @@ void Leaf::ChangeMap(int x, int y, int Height, int Width, int k) {
         }
     }
 }
-
-//void Leaf::ChangeMap(int x, int y, int Height, int Width, int k) {
-//    for (int i = y - 1; i < y + Height + 1; i++) {
-//        for (int j = x - 1; j < x + Width + 1; j++) {
-//            this->_map[i][j] = _Rooms[k].getmap(i, j);
-//        }
-//    }
-//}
 
 void Leaf::ChangePoint(int x, int y, int c, int k) {
     this->_map[y][x] = c;
@@ -118,27 +104,23 @@ void Leaf::MakeBorder(char c) {
 void Leaf::MakeTrails() {
     random_device dev;
     mt19937 rng(dev());
-    for (int k = 0; k < count_trails; k++) {   //_Rooms.size()
+    for (int k = 0; k < _count_trails; k++) {
         int x = 0, y = 0;
         while (_map[y][x] != char_border) {
             uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
             uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
             x = dist_x(rng);
             y = dist_y(rng);
-            //cout << "x = " << x << " y = " << y << " getmap = " << _map[y][x] << endl;
         }
         ChangePoint(x, y, char_trail, k);
 
         // Первый шаг
-        int count = 0;    //Номер хода
+        int count = 0;    //Номер шага
         char forbidden_step;    //Нельзя идти в обратном направлении
         while (count != 1 and count > -30) {
             vector<char> direction = {'U', 'R', 'D', 'L'};
             int a[4] = {y, _width - x, _height - y, x};
-            char move_of_direction = random(direction, a);
-
-            //cout << move_of_direction << _map[y - 1][x] << ' ' << _map[y][x + 1] << ' ' << _map[y - 1][x] << ' '
-            //     << _map[y + 1][x] << ' ' << _map[y][x - 1] << endl;
+            char move_of_direction = random(direction, a);   //Случайное направление движения
 
             if (move_of_direction == 'U' and _map[y - 1][x] != char_blank and
                 _map[y - 1][x] != char_border) {       //Вверх и смотрим чтобы не пошел внутрь комнаты
@@ -148,19 +130,19 @@ void Leaf::MakeTrails() {
 
             }
             if (move_of_direction == 'R' and _map[y][x + 1] != char_blank and
-                _map[y][x + 1] != char_border) {             //Вправо и смотрим чтобы не пошел внутрь комнаты
+                _map[y][x + 1] != char_border) {       //Вправо и смотрим чтобы не пошел внутрь комнаты
                 x++;
                 count = 2;
                 forbidden_step = 'L';
             }
             if (move_of_direction == 'D' and _map[y + 1][x] != char_blank and
-                _map[y + 1][x] != char_border) {             //Вниз и смотрим чтобы не пошел внутрь комнаты
+                _map[y + 1][x] != char_border) {        //Вниз и смотрим чтобы не пошел внутрь комнаты
                 y++;
                 count = 2;
                 forbidden_step = 'U';
             }
             if (move_of_direction == 'L' and _map[y][x - 1] != char_blank and
-                _map[y][x - 1] != char_border) {             //Влево и смотрим чтобы не пошел внутрь комнаты
+                _map[y][x - 1] != char_border) {        //Влево и смотрим чтобы не пошел внутрь комнаты
                 x--;
                 count = 2;
                 forbidden_step = 'R';
@@ -188,8 +170,9 @@ void Leaf::MakeTrails() {
             int a[4] = {y * _width / 100, (_width - x) * _height / 100,
                         (_height - y) * _width / 100, x * _height / 100};
             char move_of_direction = random(direction, a);
-            //cout << k << " step " << move_of_direction << endl;
-            if (move_of_direction == 'U' and move_of_direction != forbidden_step and y > 3) {       //Вверх
+
+            //Движение
+            if (move_of_direction == 'U' and move_of_direction != forbidden_step and y > 3) {                //Вверх
                 y--;
                 forbidden_step = 'D';
             }
@@ -201,11 +184,12 @@ void Leaf::MakeTrails() {
                 y++;
                 forbidden_step = 'U';
             }
-            if (move_of_direction == 'L' and move_of_direction != forbidden_step and x > 4) {       //Влево
+            if (move_of_direction == 'L' and move_of_direction != forbidden_step and x > 4) {                 //Влево
                 x--;
                 forbidden_step = 'R';
             }
 
+            //Проверка на то, не дошла ли тропа до комнаты
             if (_map[y][x] == char_border or _map[y][x] == char_blank) {
                 ChangePoint(x, y, char_trail, k);
                 break;
@@ -247,12 +231,12 @@ void Leaf::ExpandVoids(char old_char, char new_char) {
 void Leaf::SetObjects() {
     random_device dev;
     mt19937 rng(dev());
+    uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
+    uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
 
     //Ловушки
     int x = 0, y = 0;
     for (int t = 0; t < _traps; t++) {
-        uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
-        uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
         while (_map[y][x] != char_blank) {
             x = dist_x(rng);
             y = dist_y(rng);
@@ -266,8 +250,6 @@ void Leaf::SetObjects() {
     //Монстры
     x = 0, y = 0;
     for (int t = 0; t < _monsters; t++) {
-        uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
-        uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
         x = dist_x(rng);
         y = dist_y(rng);
         while (_map[y][x] != char_monsters) {
@@ -285,8 +267,6 @@ void Leaf::SetObjects() {
     //Сундуки
     x = 0, y = 0;
     for (int t = 0; t < _chests; t++) {
-        uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
-        uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
         while (_map[y][x] != char_blank) {
             x = dist_x(rng);
             y = dist_y(rng);
@@ -300,8 +280,6 @@ void Leaf::SetObjects() {
     //SMTH
     x = 0, y = 0;
     for (int t = 0; t < _smth; t++) {
-        uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
-        uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
         while (_map[y][x] != char_blank) {
             x = dist_x(rng);
             y = dist_y(rng);
@@ -317,10 +295,10 @@ void Leaf::SetObjects() {
 void Leaf::SetInputExit() {
     random_device dev;
     mt19937 rng(dev());
-    int x_in = 0, y_in = 0;
-    int x_ex = 0, y_ex = 0;
     uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
     uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
+    int x_in = 0, y_in = 0;
+    int x_ex = 0, y_ex = 0;
 
     //Устанавливаем вход
     while (true) {

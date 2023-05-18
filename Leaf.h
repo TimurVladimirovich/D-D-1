@@ -4,11 +4,6 @@
 #include "Room.h"
 
 
-
-using namespace std;
-
-
-
 class Leaf {
 protected:
     int _width, _height;
@@ -17,7 +12,6 @@ protected:
     int _traps, _monsters, _chests, _smth, _count_rooms, _count_trails;
     vector<Room> _Rooms;
 public:
-    //Leaf(int Width, int Height, int difficulty, char ( &a )[height][width]);
     Leaf(int Width, int Height, int Difficulty);
 
     void MakeTrails();
@@ -32,9 +26,9 @@ public:
     int getTraps(){ return _traps;}
     int getMonsters(){ return _monsters;}
     int getChests(){ return _chests;}
+    int getSMTH(){return _smth;}
     int getCountRooms(){ return _count_rooms;}
     char getMap(int i,int j){ return _map[i][j];}
 };
-
 
 #endif //HEADER_LEAF_H

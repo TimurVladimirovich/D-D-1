@@ -1,23 +1,21 @@
-//#include "everything.cpp"
-
-#include "Leaf.h"
 #include "Leaf.cpp"
-#include "Room.h"
 #include "Room.cpp"
 
 
 int main() {
 
     Leaf Leaf_0(width, height, difficulty);
+    cout << "The dungeon has been created. " << endl;
+    cout << Leaf_0.getTraps() << " Traps  " << endl << Leaf_0.getMonsters() << " Monsters  " << endl
+         << Leaf_0.getChests() << " Chests  " << endl << Leaf_0.getSMTH() << " SMTH? " << endl
+         << Leaf_0.getCountRooms() << " Rooms" << endl;
+    Leaf_0.MakeBorder(char_border);                              // Делаем границу
+    Leaf_0.MakeTrails();                                            // Делаем тропы
+    Leaf_0.MakeBorder(char_border);                              // Делаем границу
+    Leaf_0.ExpandVoids(char_border, char_blank);    // Удаляем артефакты (единичные границы)
 
-    cout << Leaf_0.getTraps() << ' ' << Leaf_0.getMonsters() << ' ' << Leaf_0.getCountRooms() << endl;
-    Leaf_0.MakeBorder(char_border);
-    cout << "Maked Border " << endl << endl;
-    Leaf_0.MakeTrails();
-    Leaf_0.MakeBorder(char_border);
-    cout << "setting traps";
-
-    //Вывод
+    //Вывод без всего
+    /*
     for (int i = 0; i < height; i++) {
         cout << "  ";
         for (int j = 0; j < width; j++) {
@@ -26,23 +24,10 @@ int main() {
         cout << endl;
     }
     cout << endl << endl << endl;
+     */
 
-
-    Leaf_0.ExpandVoids(char_border, char_blank);
-
-    //Вывод
-    for (int i = 0; i < height; i++) {
-        cout << "  ";
-        for (int j = 0; j < width; j++) {
-            cout << Leaf_0.getMap(i, j);
-        }
-        cout << endl;
-    }
-    cout << endl << endl << endl;
-
-    Leaf_0.SetObjects();
-    Leaf_0.SetInputExit();
-
+    Leaf_0.SetObjects();                                            // Устанавливаем объекты
+    Leaf_0.SetInputExit();                                          // Устанавливаем вход/выход
 
 
     //Вывод с границей
@@ -56,9 +41,10 @@ int main() {
     cout << endl << endl << endl;
 
 
-    Leaf_0.ChangeChar(char_border, char_wall);
+    Leaf_0.ChangeChar(char_border, char_wall);      // Заменяем границу на стену
+    //Leaf_0.ChangeChar(char_border, char_blank);                   // Заменяем границу на символ
 
-    //Вывод
+    //Вывод со всем
     for (int i = 0; i < height; i++) {
         cout << "  ";
         for (int j = 0; j < width; j++) {
@@ -68,10 +54,10 @@ int main() {
     }
 
 
-    string name = "Leaf_difficulty(" + to_string(difficulty) + ") _rooms(" + to_string(count_rooms) + ") _trails("
-                  + to_string(count_trails) + ") _sizecoef(" + to_string(size_coefficient)+").txt";
 
     //Запись в файл
+    string name = "Leaf_difficulty(" + to_string(difficulty) + ") _rooms(" + to_string(count_rooms) + ") _trails("
+                  + to_string(count_trails) + ") _sizecoef(" + to_string(size_coefficient) + ").txt";
     ofstream out;          // поток для записи
     out.open(name);      // открываем файл для записи
     if (out.is_open()) {
@@ -85,31 +71,5 @@ int main() {
     }
     out.close();
     cout << "File has been written" << endl;
-
-
-    //Игра с символами
-    /*
-    out.open("Chars.txt");      // открываем файл для записи
-    if (out.is_open())
-    {
-        for(int i=0;i<255;i++){
-            out<<i<<' '<< char(i)<<endl;
-        }
-    }
-    out.close();
-
-
-    //3 ♥
-    //40 41 ()
-    //33 !
-    //79 O
-    //91 92 []
-    //206 ╬
-    //127 ⌂
-
-    for(int i=0;i<255;i++){
-        cout<<i<<' '<< char(i)<<endl;
-    }
-    */
     return 0;
 }

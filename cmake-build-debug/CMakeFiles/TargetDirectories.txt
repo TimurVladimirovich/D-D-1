@@ -1,3 +1,3 @@
-C:/Users/boldi/Documents/reposit/cmake-build-debug/CMakeFiles/MIPT.dir
-C:/Users/boldi/Documents/reposit/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/boldi/Documents/reposit/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/boldi/Documents/D-D/cmake-build-debug/CMakeFiles/D-D.dir
+C:/Users/boldi/Documents/D-D/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/boldi/Documents/D-D/cmake-build-debug/CMakeFiles/rebuild_cache.dir

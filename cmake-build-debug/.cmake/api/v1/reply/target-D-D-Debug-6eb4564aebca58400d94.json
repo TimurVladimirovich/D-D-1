@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "MIPT.exe"
+			"path" : "D-D.exe"
 		},
 		{
-			"path" : "MIPT.pdb"
+			"path" : "D-D.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -27,7 +27,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 12,
+				"line" : 8,
 				"parent" : 0
 			}
 		]
@@ -59,7 +59,7 @@
 			]
 		}
 	],
-	"id" : "MIPT::@6890427a1f51a3e7e1df",
+	"id" : "D-D::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -79,8 +79,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "MIPT",
-	"nameOnDisk" : "MIPT.exe",
+	"name" : "D-D",
+	"nameOnDisk" : "D-D.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -101,7 +101,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "MIPT/DandD/main.cpp",
+			"path" : "main.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],
