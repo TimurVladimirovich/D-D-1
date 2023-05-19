@@ -14,6 +14,7 @@ char Random(vector<char> &v, int ( &a )[4]) {
     return v[r];
 }
 
+
 Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coefficient, int Count_rooms,
            int Count_trails) {
     this->C = C;
@@ -23,6 +24,9 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
     this->_size_coefficient = Size_coefficient;
     this->_count_rooms = Count_rooms;
     this->_count_trails = Count_trails;
+
+
+    //Заполняем массив символами стены
     for (int i = 0; i < _height; i++) {
         for (int j = 0; j < _width; j++) {
             this->_map[i][j] = C.char_wall;
@@ -43,6 +47,8 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
 
     //Создание комнат
     for (int k = 0; k < _count_rooms; k++) {
+        cout << "Creating a new room " << endl;
+
         // Максимальные координаты новой комнаты (левый верхний угол)
         int xmax = int((this->_width) * 0.75);
         int ymax = int((this->_height) * 0.75);
@@ -65,7 +71,7 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
 
 
         //Создание комнаты
-        this->_Rooms.push_back(Room(C, _width, _height, x, y, Width_Room, Height_Room, _Rooms));
+        this->_Rooms.push_back(Room(C, _width, _height, x, y, Width_Room, Height_Room));
 
         //Изменение карты
         ChangeMap(x, y, Height_Room, Width_Room, k);
