@@ -1,15 +1,31 @@
 #include "Leaf.h"
 
+// Функция рандома из списка длинной 4 и вероятность выпадения каждого элемента
+char Random(vector<char> &v, int ( &a )[4]) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < a[i]; j++) {
+            v.push_back(v[i]);
+        }
+    }
+    random_device dev;
+    mt19937 rng(dev());
+    uniform_int_distribution<mt19937::result_type> dist_r(0, v.size());
+    int r = dist_r(rng);
+    return v[r];
+}
 
-Leaf::Leaf(int Width, int Height, int Difficulty) {
+Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coefficient, int Count_rooms,
+           int Count_trails) {
+    this->C = C;
     this->_width = Width;
     this->_height = Height;
     this->_difficulty = Difficulty;
-    this->_count_rooms = count_rooms;
-    this->_count_trails = count_trails;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            this->_map[i][j] = char_wall;
+    this->_size_coefficient = Size_coefficient;
+    this->_count_rooms = Count_rooms;
+    this->_count_trails = Count_trails;
+    for (int i = 0; i < _height; i++) {
+        for (int j = 0; j < _width; j++) {
+            this->_map[i][j] = C.char_wall;
         }
     }
 
@@ -26,7 +42,7 @@ Leaf::Leaf(int Width, int Height, int Difficulty) {
     this->_smth = dist_smth(rng);
 
     //Создание комнат
-    for (int k = 0; k < count_rooms; k++) {
+    for (int k = 0; k < _count_rooms; k++) {
         // Максимальные координаты новой комнаты (левый верхний угол)
         int xmax = int((this->_width) * 0.75);
         int ymax = int((this->_height) * 0.75);
@@ -38,21 +54,21 @@ Leaf::Leaf(int Width, int Height, int Difficulty) {
         int y = dist_y(rng);
 
         //Максимальный размер новой комнаты
-        int Width_max = 2 + (this->_width - x) * size_coefficient;
-        int Hight_max = 2 + (this->_height - y) * size_coefficient;
+        int Width_max = 2 + (this->_width - x) * _size_coefficient;
+        int Hight_max = 2 + (this->_height - y) * _size_coefficient;
 
         // Рандомные размер новой комнаты
         uniform_int_distribution<mt19937::result_type> dist_size_x(4, Width_max + 1);
         uniform_int_distribution<mt19937::result_type> dist_size_y(4, Hight_max + 1);
-        int Width = dist_size_x(rng);
-        int Height = dist_size_y(rng);
+        int Width_Room = dist_size_x(rng);
+        int Height_Room = dist_size_y(rng);
 
 
         //Создание комнаты
-        this->_Rooms.push_back(Room(x, y, Width, Height, k, _Rooms));
+        this->_Rooms.push_back(Room(C, _width, _height, x, y, Width_Room, Height_Room, _Rooms));
 
         //Изменение карты
-        ChangeMap(x, y, Height, Width, k);
+        ChangeMap(x, y, Height_Room, Width_Room, k);
 
         //Вывод
         /*
@@ -86,13 +102,14 @@ void Leaf::ChangePoint(int x, int y, int c, int k) {
 
 
 void Leaf::MakeBorder(char c) {
-    for (int i = 2; i < height - 2; i++) {
-        for (int j = 2; j < width - 2; j++) {
-            if (_map[i][j] == char_wall) {
-                if (_map[i + 1][j] == char_blank or _map[i - 1][j] == char_blank or _map[i][j + 1] == char_blank or
-                    _map[i][j - 1] == char_blank or _map[i + 1][j + 1] == char_blank or
-                    _map[i - 1][j + 1] == char_blank or
-                    _map[i + 1][j - 1] == char_blank or _map[i - 1][j - 1] == char_blank) {
+    for (int i = 2; i < _height - 2; i++) {
+        for (int j = 2; j < _width - 2; j++) {
+            if (_map[i][j] == C.char_wall) {
+                if (_map[i + 1][j] == C.char_blank or _map[i - 1][j] == C.char_blank or
+                    _map[i][j + 1] == C.char_blank or
+                    _map[i][j - 1] == C.char_blank or _map[i + 1][j + 1] == C.char_blank or
+                    _map[i - 1][j + 1] == C.char_blank or
+                    _map[i + 1][j - 1] == C.char_blank or _map[i - 1][j - 1] == C.char_blank) {
                     _map[i][j] = c;
                 }
             }
@@ -106,13 +123,13 @@ void Leaf::MakeTrails() {
     mt19937 rng(dev());
     for (int k = 0; k < _count_trails; k++) {
         int x = 0, y = 0;
-        while (_map[y][x] != char_border) {
+        while (_map[y][x] != C.char_border) {
             uniform_int_distribution<mt19937::result_type> dist_x(3, _width - 3);
             uniform_int_distribution<mt19937::result_type> dist_y(3, _height - 3);
             x = dist_x(rng);
             y = dist_y(rng);
         }
-        ChangePoint(x, y, char_trail, k);
+        ChangePoint(x, y, C.char_trail, k);
 
         // Первый шаг
         int count = 0;    //Номер шага
@@ -120,40 +137,40 @@ void Leaf::MakeTrails() {
         while (count != 1 and count > -30) {
             vector<char> direction = {'U', 'R', 'D', 'L'};
             int a[4] = {y, _width - x, _height - y, x};
-            char move_of_direction = random(direction, a);   //Случайное направление движения
+            char move_of_direction = Random(direction, a);   //Случайное направление движения
 
-            if (move_of_direction == 'U' and _map[y - 1][x] != char_blank and
-                _map[y - 1][x] != char_border) {       //Вверх и смотрим чтобы не пошел внутрь комнаты
+            if (move_of_direction == 'U' and _map[y - 1][x] != C.char_blank and
+                _map[y - 1][x] != C.char_border) {       //Вверх и смотрим чтобы не пошел внутрь комнаты
                 y--;
                 count = 2;
                 forbidden_step = 'D';
 
             }
-            if (move_of_direction == 'R' and _map[y][x + 1] != char_blank and
-                _map[y][x + 1] != char_border) {       //Вправо и смотрим чтобы не пошел внутрь комнаты
+            if (move_of_direction == 'R' and _map[y][x + 1] != C.char_blank and
+                _map[y][x + 1] != C.char_border) {       //Вправо и смотрим чтобы не пошел внутрь комнаты
                 x++;
                 count = 2;
                 forbidden_step = 'L';
             }
-            if (move_of_direction == 'D' and _map[y + 1][x] != char_blank and
-                _map[y + 1][x] != char_border) {        //Вниз и смотрим чтобы не пошел внутрь комнаты
+            if (move_of_direction == 'D' and _map[y + 1][x] != C.char_blank and
+                _map[y + 1][x] != C.char_border) {        //Вниз и смотрим чтобы не пошел внутрь комнаты
                 y++;
                 count = 2;
                 forbidden_step = 'U';
             }
-            if (move_of_direction == 'L' and _map[y][x - 1] != char_blank and
-                _map[y][x - 1] != char_border) {        //Влево и смотрим чтобы не пошел внутрь комнаты
+            if (move_of_direction == 'L' and _map[y][x - 1] != C.char_blank and
+                _map[y][x - 1] != C.char_border) {        //Влево и смотрим чтобы не пошел внутрь комнаты
                 x--;
                 count = 2;
                 forbidden_step = 'R';
             }
             count--;
-            ChangePoint(x, y, char_trail, k);
+            ChangePoint(x, y, C.char_trail, k);
         }
 
 
         //Идём до следующей комнаты
-        while (_map[y][x] != char_border or _map[y][x] != char_blank) {
+        while (_map[y][x] != C.char_border or _map[y][x] != C.char_blank) {
 
             //Вывод
             /*
@@ -169,7 +186,7 @@ void Leaf::MakeTrails() {
             vector<char> direction = {'U', 'R', 'D', 'L'};
             int a[4] = {y * _width / 100, (_width - x) * _height / 100,
                         (_height - y) * _width / 100, x * _height / 100};
-            char move_of_direction = random(direction, a);
+            char move_of_direction = Random(direction, a);
 
             //Движение
             if (move_of_direction == 'U' and move_of_direction != forbidden_step and y > 3) {                //Вверх
@@ -190,25 +207,25 @@ void Leaf::MakeTrails() {
             }
 
             //Проверка на то, не дошла ли тропа до комнаты
-            if (_map[y][x] == char_border or _map[y][x] == char_blank) {
-                ChangePoint(x, y, char_trail, k);
+            if (_map[y][x] == C.char_border or _map[y][x] == C.char_blank) {
+                ChangePoint(x, y, C.char_trail, k);
                 break;
             }
-            ChangePoint(x, y, char_trail, k);
+            ChangePoint(x, y, C.char_trail, k);
         }
 
         //Красим тропу в пробелы
         for (int i = 0; i < _height; i++) {
             for (int j = 0; j < _width; j++) {
-                if (_map[i][j] == char_trail) { _map[i][j] = char_blank; }
+                if (_map[i][j] == C.char_trail) { _map[i][j] = C.char_blank; }
             }
         }
     }
 }
 
 void Leaf::ChangeChar(char old_char, char new_char) {
-    for (int i = 1; i < height - 1; i++) {
-        for (int j = 1; j < width - 1; j++) {
+    for (int i = 1; i < _height - 1; i++) {
+        for (int j = 1; j < _width - 1; j++) {
             if (_map[i][j] == old_char) {
                 _map[i][j] = new_char;
             }
@@ -217,8 +234,8 @@ void Leaf::ChangeChar(char old_char, char new_char) {
 }
 
 void Leaf::ExpandVoids(char old_char, char new_char) {
-    for (int i = 1; i < height - 1; i++) {
-        for (int j = 1; j < width - 1; j++) {
+    for (int i = 1; i < _height - 1; i++) {
+        for (int j = 1; j < _width - 1; j++) {
             if (_map[i][j] == old_char and ((_map[i + 1][j] == new_char and _map[i - 1][j] == new_char) or
                                             (_map[i][j + 1] == new_char and _map[i][j - 1] == new_char))) {
                 _map[i][j] = new_char;
@@ -237,11 +254,11 @@ void Leaf::SetObjects() {
     //Ловушки
     int x = 0, y = 0;
     for (int t = 0; t < _traps; t++) {
-        while (_map[y][x] != char_blank) {
+        while (_map[y][x] != C.char_blank) {
             x = dist_x(rng);
             y = dist_y(rng);
-            if (_map[y][x] == char_blank) {
-                _map[y][x] = char_traps;
+            if (_map[y][x] == C.char_blank) {
+                _map[y][x] = C.char_traps;
                 break;
             }
         }
@@ -252,14 +269,15 @@ void Leaf::SetObjects() {
     for (int t = 0; t < _monsters; t++) {
         x = dist_x(rng);
         y = dist_y(rng);
-        while (_map[y][x] != char_monsters) {
+        while (_map[y][x] != C.char_monsters) {
             x = dist_x(rng);
             y = dist_y(rng);
-            if (_map[y][x] == char_blank and _map[y + 1][x] == char_blank and _map[y - 1][x] == char_blank and
-                _map[y][x + 1] == char_blank and _map[y][x - 1] == char_blank and _map[y + 1][x + 1] == char_blank and
-                _map[y - 1][x + 1] == char_blank and _map[y + 1][x - 1] == char_blank and
-                _map[y - 1][x - 1] == char_blank) {
-                _map[y][x] = char_monsters;
+            if (_map[y][x] == C.char_blank and _map[y + 1][x] == C.char_blank and _map[y - 1][x] == C.char_blank and
+                _map[y][x + 1] == C.char_blank and _map[y][x - 1] == C.char_blank and
+                _map[y + 1][x + 1] == C.char_blank and
+                _map[y - 1][x + 1] == C.char_blank and _map[y + 1][x - 1] == C.char_blank and
+                _map[y - 1][x - 1] == C.char_blank) {
+                _map[y][x] = C.char_monsters;
             }
         }
     }
@@ -267,11 +285,11 @@ void Leaf::SetObjects() {
     //Сундуки
     x = 0, y = 0;
     for (int t = 0; t < _chests; t++) {
-        while (_map[y][x] != char_blank) {
+        while (_map[y][x] != C.char_blank) {
             x = dist_x(rng);
             y = dist_y(rng);
-            if (_map[y][x] == char_blank) {
-                _map[y][x] = char_chests;
+            if (_map[y][x] == C.char_blank) {
+                _map[y][x] = C.char_chests;
                 break;
             }
         }
@@ -280,11 +298,11 @@ void Leaf::SetObjects() {
     //SMTH
     x = 0, y = 0;
     for (int t = 0; t < _smth; t++) {
-        while (_map[y][x] != char_blank) {
+        while (_map[y][x] != C.char_blank) {
             x = dist_x(rng);
             y = dist_y(rng);
-            if (_map[y][x] == char_blank) {
-                _map[y][x] = char_smth;
+            if (_map[y][x] == C.char_blank) {
+                _map[y][x] = C.char_smth;
                 break;
             }
         }
@@ -304,14 +322,14 @@ void Leaf::SetInputExit() {
     while (true) {
         x_in = dist_x(rng);
         y_in = dist_y(rng);
-        if (_map[y_in][x_in] == char_border and _map[y_in][x_in + 1] == char_border) {
-            _map[y_in][x_in] = char_input_1;
-            _map[y_in][x_in + 1] = char_input_2;
+        if (_map[y_in][x_in] == C.char_border and _map[y_in][x_in + 1] == C.char_border) {
+            _map[y_in][x_in] = C.char_input_1;
+            _map[y_in][x_in + 1] = C.char_input_2;
             break;
         }
-        if (_map[y_in][x_in - 1] == char_border and _map[y_in][x_in] == char_border) {
-            _map[y_in][x_in - 1] = char_input_1;
-            _map[y_in][x_in] = char_input_2;
+        if (_map[y_in][x_in - 1] == C.char_border and _map[y_in][x_in] == C.char_border) {
+            _map[y_in][x_in - 1] = C.char_input_1;
+            _map[y_in][x_in] = C.char_input_2;
             break;
         }
     }
@@ -325,14 +343,14 @@ void Leaf::SetInputExit() {
             x_ex = dist_x(rng);
             y_ex = dist_y(rng);
         }
-        if (_map[y_ex][x_ex] == char_border and _map[y_ex][x_ex + 1] == char_border) {
-            _map[y_ex][x_ex] = char_exit_1;
-            _map[y_ex][x_ex + 1] = char_exit_2;
+        if (_map[y_ex][x_ex] == C.char_border and _map[y_ex][x_ex + 1] == C.char_border) {
+            _map[y_ex][x_ex] = C.char_exit_1;
+            _map[y_ex][x_ex + 1] = C.char_exit_2;
             break;
         }
-        if (_map[y_ex][x_ex - 1] == char_border and _map[y_ex][x_ex] == char_border) {
-            _map[y_ex][x_ex - 1] = char_exit_1;
-            _map[y_ex][x_ex] = char_exit_2;
+        if (_map[y_ex][x_ex - 1] == C.char_border and _map[y_ex][x_ex] == C.char_border) {
+            _map[y_ex][x_ex - 1] = C.char_exit_1;
+            _map[y_ex][x_ex] = C.char_exit_2;
             break;
         }
     }

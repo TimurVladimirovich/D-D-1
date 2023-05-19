@@ -1,18 +1,29 @@
 #ifndef HEADER_LEAF_H
 #define HEADER_LEAF_H
 
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <array>
+using namespace std;
+
 #include "Room.h"
+#include "Chars.h"
 
 
 class Leaf {
 protected:
+    Chars C;
     int _width, _height;
     int _difficulty;
-    char _map[height][width];
+    float _size_coefficient;
+    char _map[40][110];
     int _traps, _monsters, _chests, _smth, _count_rooms, _count_trails;
     vector<Room> _Rooms;
 public:
-    Leaf(int Width, int Height, int Difficulty);
+    Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coefficient, int Count_rooms,
+         int Count_trails);
 
     void MakeTrails();
     void MakeBorder(char c);

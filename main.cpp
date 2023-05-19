@@ -1,18 +1,42 @@
-#include "Leaf.cpp"
-#include "Room.cpp"
+#include <iostream>
+#include <string>
+#include <random>
+#include <functional>
+#include <vector>
+#include <list>
+#include <cmath>
+#include <algorithm>
+#include <fstream>
+using namespace std;
 
+
+#include "Leaf.h"
+#include "Room.h"
+#include "Chars.h"
 
 int main() {
 
-    Leaf Leaf_0(width, height, difficulty);
+    //Типа ввели
+    int width = 110;      //Ширина пещеры
+    int height = 40;      //Высота пещеры
+    int difficulty = 3;         //Сложность уровня (=> насыщенность)
+    float size_coefficient=0.3; //Коэффициент Максимального размера комнаты
+    int count_rooms = 5;        //Количество комнат
+    int count_trails = 20;      //Количество троп
+
+
+    Chars C;
+    Leaf Leaf_0(C, width, height, difficulty, size_coefficient, count_rooms, count_trails);
     cout << "The dungeon has been created. " << endl;
     cout << Leaf_0.getTraps() << " Traps  " << endl << Leaf_0.getMonsters() << " Monsters  " << endl
          << Leaf_0.getChests() << " Chests  " << endl << Leaf_0.getSMTH() << " SMTH? " << endl
          << Leaf_0.getCountRooms() << " Rooms" << endl;
-    Leaf_0.MakeBorder(char_border);                              // Делаем границу
-    Leaf_0.MakeTrails();                                            // Делаем тропы
-    Leaf_0.MakeBorder(char_border);                              // Делаем границу
-    Leaf_0.ExpandVoids(char_border, char_blank);    // Удаляем артефакты (единичные границы)
+    Leaf_0.MakeBorder(C.char_border);                              // Делаем границу
+    Leaf_0.MakeTrails();                                              // Делаем тропы
+    cout<<'q';
+    Leaf_0.MakeBorder(C.char_border);                              // Делаем границу
+    cout<<'q';
+    Leaf_0.ExpandVoids(C.char_border, C.char_blank);  // Удаляем артефакты (единичные границы)
 
     //Вывод без всего
     /*
@@ -41,7 +65,7 @@ int main() {
     cout << endl << endl << endl;
 
 
-    Leaf_0.ChangeChar(char_border, char_wall);      // Заменяем границу на стену
+    Leaf_0.ChangeChar(C.char_border, C.char_wall);      // Заменяем границу на стену
     //Leaf_0.ChangeChar(char_border, char_blank);                   // Заменяем границу на символ
 
     //Вывод со всем
