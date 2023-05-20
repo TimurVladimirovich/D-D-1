@@ -1,0 +1,6 @@
+width 117   #Это максимум
+height 40
+difficulty = 2
+size_coefficient = 0.2
+count_rooms = 4
+count_trails = 20

@@ -47,11 +47,11 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
 
     //Создание комнат
     for (int k = 0; k < _count_rooms; k++) {
-        cout << "Creating a new room " << endl;
+        cout<<"Creating a new room"<<endl;
 
         // Максимальные координаты новой комнаты (левый верхний угол)
-        int xmax = int((this->_width) * 0.75);
-        int ymax = int((this->_height) * 0.75);
+        int xmax = int((this->_width) - 7);
+        int ymax = int((this->_height) - 7);
 
         // Рандомные координаты новой комнаты
         uniform_int_distribution<mt19937::result_type> dist_x(4, xmax);
@@ -60,15 +60,20 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
         int y = dist_y(rng);
 
         //Максимальный размер новой комнаты
-        int Width_max = 2 + (this->_width - x) * _size_coefficient;
-        int Hight_max = 2 + (this->_height - y) * _size_coefficient;
+        int Width_max = 4 + (this->_width - x) * _size_coefficient;
+        int Hight_max = 4 + (this->_height - y) * _size_coefficient;
 
         // Рандомные размер новой комнаты
-        uniform_int_distribution<mt19937::result_type> dist_size_x(4, Width_max + 1);
-        uniform_int_distribution<mt19937::result_type> dist_size_y(4, Hight_max + 1);
+        uniform_int_distribution<mt19937::result_type> dist_size_x(3, Width_max);
+        uniform_int_distribution<mt19937::result_type> dist_size_y(3, Hight_max);
         int Width_Room = dist_size_x(rng);
         int Height_Room = dist_size_y(rng);
-
+        while(x + Width_Room > _width - 2){
+            Width_Room = dist_size_x(rng);
+        }
+        while(y + Height_Room > _height - 2){
+            Height_Room = dist_size_x(rng);
+        }
 
         //Создание комнаты
         this->_Rooms.push_back(Room(C, _width, _height, x, y, Width_Room, Height_Room));
@@ -78,11 +83,11 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
 
         //Вывод
         /*
-        cout<<"Creating a new room "<<endl;
         cout << "xmax = " << xmax << " ymax = " << ymax << endl;
         cout << "x = " << x << " y = " << y << endl;
         cout << "Width_max = " << Width_max << " Hight_max = " << Hight_max << endl;
-        cout << "Width = " << Width << " Height = " << Height << endl;
+        cout << "Width_Room = " << Width_Room << " Height_Room = " << Height_Room << endl;
+        cout<<endl<<endl;
         for (int i = 0; i < _height; i++) {
             cout << "  ";
             for (int j = 0; j < _width; j++) {

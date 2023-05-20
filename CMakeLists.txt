@@ -8,3 +8,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_executable(D-D main.cpp
             Leaf.cpp
             Room.cpp)
+
+#
+#add_executable(D-D
+#        fileqqq.cpp)

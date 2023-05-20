@@ -19,7 +19,7 @@ protected:
     int _difficulty;
     float _size_coefficient;
     int _traps, _monsters, _chests, _smth, _count_rooms, _count_trails;
-    array<array<char, 600>, 300> _map;
+    array<array<char, 200>, 600> _map;
     vector<Room> _Rooms;
 public:
     Leaf(Chars C, int Width, int Height, int Difficulty, float Size_coefficient, int Count_rooms,

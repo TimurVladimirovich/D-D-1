@@ -8,7 +8,7 @@
 class Room {
 protected:
     int x1, y1, x2, y2;
-    array<array<char, 600>, 300> map_in_room;
+    array<array<char, 200>, 600> map_in_room;
 public:
     Room(Chars C, int Width_Leaf, int Height_Leaf, int x, int y, int Width, int Height);
 
