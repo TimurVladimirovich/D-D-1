@@ -20,6 +20,7 @@ public:
     char char_input_2 = char(41); // )
     char char_exit_1 = char(91); // [
     char char_exit_2 = char(93); // ]
+    char char_person = char(1);  // ☺
     Chars(){};
 
 };

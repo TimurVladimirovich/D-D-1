@@ -47,7 +47,7 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
 
     //Создание комнат
     for (int k = 0; k < _count_rooms; k++) {
-        cout<<"Creating a new room"<<endl;
+        //cout<<"Creating a new room"<<endl;
 
         // Максимальные координаты новой комнаты (левый верхний угол)
         int xmax = int((this->_width) - 7);
@@ -66,17 +66,19 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
         // Рандомные размер новой комнаты
         uniform_int_distribution<mt19937::result_type> dist_size_x(3, Width_max);
         uniform_int_distribution<mt19937::result_type> dist_size_y(3, Hight_max);
+        uniform_int_distribution<mt19937::result_type> dist_size_for_while(2, 5);
         int Width_Room = dist_size_x(rng);
         int Height_Room = dist_size_y(rng);
+        int redact = dist_size_for_while(rng);
         while(x + Width_Room > _width - 2){
-            Width_Room = dist_size_x(rng);
+            Width_Room -= redact;
         }
         while(y + Height_Room > _height - 2){
-            Height_Room = dist_size_x(rng);
+            Height_Room -= redact;
         }
 
         //Создание комнаты
-        this->_Rooms.push_back(Room(C, _width, _height, x, y, Width_Room, Height_Room));
+        this->_Rooms.push_back(Room(C, x, y, Width_Room, Height_Room));
 
         //Изменение карты
         ChangeMap(x, y, Height_Room, Width_Room, k);
@@ -99,15 +101,27 @@ Leaf::Leaf(Chars C, const int Width, int Height, int Difficulty, float Size_coef
     }
 }
 
+void Leaf::getMap() {
+    for (int i = 0; i < _height; i++) {
+        cout << "  ";
+        for (int j = 0; j < _width; j++) {
+            cout << _map[i][j];
+        }
+        cout << endl;
+    }
+    cout << endl << endl << endl;
+}
+
+
 void Leaf::ChangeMap(int x, int y, int Height, int Width, int k) {
     for (int i = y; i < y + Height; i++) {
         for (int j = x; j < x + Width; j++) {
-            this->_map[i][j] = _Rooms[k].getmap(i, j);
+            this->_map[i][j] = _Rooms[k].getpoint(i, j);
         }
     }
 }
 
-void Leaf::ChangePoint(int x, int y, int c, int k) {
+void Leaf::ChangePoint(int x, int y, int c) {
     this->_map[y][x] = c;
 }
 
@@ -140,7 +154,7 @@ void Leaf::MakeTrails() {
             x = dist_x(rng);
             y = dist_y(rng);
         }
-        ChangePoint(x, y, C.char_trail, k);
+        ChangePoint(x, y, C.char_trail);
 
         // Первый шаг
         int count = 0;    //Номер шага
@@ -176,7 +190,7 @@ void Leaf::MakeTrails() {
                 forbidden_step = 'R';
             }
             count--;
-            ChangePoint(x, y, C.char_trail, k);
+            ChangePoint(x, y, C.char_trail);
         }
 
 
@@ -184,15 +198,7 @@ void Leaf::MakeTrails() {
         while (_map[y][x] != C.char_border or _map[y][x] != C.char_blank) {
 
             //Вывод
-            /*
-            for (int i = 0; i < _height; i++) {
-                cout << "  ";
-                for (int j = 0; j < _width; j++) {
-                    cout << _map[i][j];
-                }
-                cout << endl;
-            }
-            */
+            //getMap();
 
             vector<char> direction = {'U', 'R', 'D', 'L'};
             int a[4] = {y * _width / 100, (_width - x) * _height / 100,
@@ -219,10 +225,10 @@ void Leaf::MakeTrails() {
 
             //Проверка на то, не дошла ли тропа до комнаты
             if (_map[y][x] == C.char_border or _map[y][x] == C.char_blank) {
-                ChangePoint(x, y, C.char_trail, k);
+                ChangePoint(x, y, C.char_trail);
                 break;
             }
-            ChangePoint(x, y, C.char_trail, k);
+            ChangePoint(x, y, C.char_trail);
         }
 
         //Красим тропу в пробелы
@@ -345,6 +351,24 @@ void Leaf::SetInputExit() {
         }
     }
 
+
+    //Устанавливаем человечка
+    for (auto i:{0,1,-1}){
+        if(_map[y_in + 1][x_in + i] == C.char_blank) {
+            _map[y_in + 1][x_in + i] = C.char_person;
+            this->person_coord_x = x_in + i;
+            this->person_coord_y = y_in + 1;
+            break;
+        }
+        if(_map[y_in - 1][x_in + i] == C.char_blank) {
+            _map[y_in - 1][x_in + i] = C.char_person;
+            this->person_coord_x = x_in + i;
+            this->person_coord_y = y_in - 1;
+            break;
+        }
+    }
+
+
     //Устанавливаем выход
     while (true) {
         x_ex = dist_x(rng);
@@ -364,5 +388,71 @@ void Leaf::SetInputExit() {
             _map[y_ex][x_ex] = C.char_exit_2;
             break;
         }
+    }
+}
+
+
+void Leaf::Move(char user_movement) {
+    vector<char> Up = {'W', 'w', '8', char(230), char(150)};                // ц Ц
+    vector<char> Right = {'D', 'd', '6', char(162), char(130)};             // в В
+    vector<char> Down = {'S', 's', '5', '2', char(235), char(155)};         // ы Ы
+    vector<char> Left = {'A', 'a', '4', char(228), char(148)};              // ф Ф
+    vector<vector<char>> Orientation = {Up,Right,Down,Left};
+    int мovement[4][2] = {{-1,0},{0,1},{1,0},{0,-1}}; //Направление движения
+
+
+
+    int k = 0;   //Номер попытки 0->Up, 1->Right, 2->Down, 3->Left
+    int not_direction = 0;
+    for(auto ori:Orientation){
+        if(find(ori.begin(),ori.end(),user_movement) != ori.end()){
+            char char_on_the_way = _map[person_coord_y + мovement[k][0]][person_coord_x + мovement[k][1]];
+            //Если может идти
+            if(char_on_the_way == C.char_blank){
+                ChangePoint(person_coord_x,person_coord_y,C.char_blank);
+                person_coord_y += мovement[k][0];
+                person_coord_x += мovement[k][1];
+                ChangePoint(person_coord_x,person_coord_y,C.char_person);
+                Move_or_not_to_move = 1;
+                break;
+            }
+
+            //Если нет
+            else if(char_on_the_way == C.char_wall){
+                cout<<"Wall!";
+            }
+            else if(char_on_the_way == C.char_border){
+                cout<<"Destructible Wall!";     //Why not?
+            }
+            else if(char_on_the_way == C.char_traps){
+                cout<<"It's A Trap!!";
+            }
+            else if(char_on_the_way == C.char_monsters){
+                cout<<"Monster!";
+            }
+            else if(char_on_the_way == C.char_chests){
+                cout<<"Chests!";
+            }
+            else if(char_on_the_way == C.char_smth){
+                cout<<"Oh, it's smth incredible!";
+            }
+            else if(char_on_the_way == C.char_input_1 or char_on_the_way == C.char_input_2){
+                cout<<"Where Did that Bring You? Back to Me!";
+            }
+            else if(char_on_the_way == C.char_exit_1 or char_on_the_way == C.char_exit_2){
+                cout<<"Leaving so early?";
+            }
+            Move_or_not_to_move = 0;
+            cout<<endl<<endl;
+        }
+        if(find(ori.begin(),ori.end(),user_movement) == ori.end()){
+            not_direction ++;
+        }
+        k++;
+    }
+    if(not_direction == 4){
+        Move_or_not_to_move = -1;
+        cout <<"This is not a direction"<<endl<<endl;
+        ;
     }
 }

@@ -10,9 +10,9 @@ protected:
     int x1, y1, x2, y2;
     array<array<char, 200>, 600> map_in_room;
 public:
-    Room(Chars C, int Width_Leaf, int Height_Leaf, int x, int y, int Width, int Height);
+    Room(Chars C, int x, int y, int Width, int Height);
 
-    char getmap(int i, int j) { return map_in_room[i][j]; }
+    char getpoint(int i, int j) { return map_in_room[i][j]; }
     int getx1() { return x1; }
     int getx2() { return x2; }
     int gety1() { return y1; }

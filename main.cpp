@@ -99,7 +99,7 @@ int main() {
     //Создание Листа,
     Chars C;
     Leaf Leaf_0(C, width, height, difficulty, size_coefficient, count_rooms, count_trails);
-    cout << "The dungeon has been created. " << endl;
+    cout << endl<< "The dungeon has been created. " << endl;
     cout << Leaf_0.getTraps() << " Traps  " << endl << Leaf_0.getMonsters() << " Monsters  " << endl
          << Leaf_0.getChests() << " Chests  " << endl << Leaf_0.getSMTH() << " SMTH? " << endl
          << Leaf_0.getCountRooms() << " Rooms" << endl;
@@ -108,31 +108,13 @@ int main() {
     Leaf_0.MakeBorder(C.char_border);                              // Делаем границу
     Leaf_0.ExpandVoids(C.char_border, C.char_blank);  // Удаляем артефакты (единичные границы)
 
-    //Вывод без всего
-    /*
-    for (int i = 0; i < height; i++) {
-        cout << "  ";
-        for (int j = 0; j < width; j++) {
-            cout << Leaf_0.getMap(i, j);
-        }
-        cout << endl;
-    }
-    cout << endl << endl << endl;
-     */
+
 
     Leaf_0.SetObjects();                                            // Устанавливаем объекты
     Leaf_0.SetInputExit();                                          // Устанавливаем вход/выход
 
-
     //Вывод с границей
-    for (int i = 0; i < height; i++) {
-        cout << "  ";
-        for (int j = 0; j < width; j++) {
-            cout << Leaf_0.getMap(i, j);
-        }
-        cout << endl;
-    }
-    cout << endl << endl << endl;
+    Leaf_0.getMap();
 
 
     Leaf_0.ChangeChar(C.char_border, C.char_wall);      // Заменяем границу на стену
@@ -140,14 +122,7 @@ int main() {
 
 
     //Конечный вывод
-    for (int i = 0; i < height; i++) {
-        cout << "  ";
-        for (int j = 0; j < width; j++) {
-            cout << Leaf_0.getMap(i, j);
-        }
-        cout << endl;
-    }
-    cout << "Dungeon is ready"<<endl<<endl;
+    Leaf_0.getMap();
 
 
     //Запись в файл
@@ -159,12 +134,27 @@ int main() {
         for (int i = 0; i < height; i++) {
             out << "  ";
             for (int j = 0; j < width; j++) {
-                out << Leaf_0.getMap(i, j);
+                out << Leaf_0.getPoint(i, j);
             }
             out << endl;
         }
     }
     out.close();
     cout << "File has been written" << endl;
+
+
+    //Движение
+    char Мovement;
+    cout <<endl<<endl<<"Now enter the direction please: "<<endl<<endl;
+    while (true){
+        cin>>Мovement;
+        Leaf_0.Move(Мovement);
+        //Проверка на движение
+        if(Leaf_0.getTrueOrFalse() == 1) {
+            Leaf_0.getMap();
+        }
+
+    }
+
     return 0;
 }
